@@ -33,7 +33,99 @@
     animation: 3ms ease-out;
     border-bottom: 2px solid saddlebrown;
 }
+.cart{
+    display: flex;
+    background-color: black;
+    color: white;
+    padding:14px 13px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    
+}
+.cart i{
+    color: white;
+    font-size: 15px;
+}
+.cart .count{
+    color: white;
+    background-color: red;
+    border-radius: 50%;
+    font-size: 8px;
+    padding: 5px;
+    margin-top: -25px;
+    margin-left: 30px;
+    position: absolute;
+}
+.cart-panel{
+    width: 30%;
+    background-color: rgb(255, 255, 255);
+    padding: 8px;
+    position: absolute;
+    right: 10px;
+    display: none;
+    border-radius: 8px;
+    /* Bayangan lembut ke bawah kanan */
+box-shadow: 2px -4px 15px rgba(0, 0, 0, 0.7);
 
+/* Bayangan tajam */
+box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+
+/* Bayangan tersebar */
+box-shadow: 0px 0px 15px 5px rgba(0, 0, 0, 0.1);
+
+/* Bayangan multi-layer */
+box-shadow: 1px 2px 5px rgba(0,0,0,0.15), 0px 0px 10px rgba(0,0,0,0.05);
+
+}
+.cart-panel h3{
+    font-size: 20px;
+    border-bottom: 2px solid black;
+    padding: 8px;
+}
+.cart-des{
+    display: grid;
+    margin-top: 5px;
+    grid-template-columns: 1fr;
+    
+}
+.cart-des .product-design  h2{
+    font-size: 10px;
+}
+.cart-des .product-design img{
+    width: 70px;
+}
+.cart-des .product-design{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.sub-me{
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid black;
+    padding: 5px;
+    margin-top: 8px;
+
+}
+.checkout{
+    text-align: center;
+    font-size: 10px;
+    border-radius: 5px;
+    background-color: rgb(63, 63, 191);
+    color: white;
+    padding: 8px;
+     margin-top: 8px;
+}
+.continue{
+    text-align: center;
+    font-size: 5px;
+    border-radius: 5px;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    padding: 8px;
+     margin-top: 8px;
+}
 .banner{
     display: flex;
    justify-content: center;
