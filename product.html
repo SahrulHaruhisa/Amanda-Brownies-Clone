@@ -260,12 +260,262 @@
         <p>2025 Amanda Brownies. All rights reserved.</p>
     </div>
   </footer>
+  <div class="container">
+    <div id="productGrid"></div>
+</div>
    <script>
     function showCategory(categoryId) {
       const categories = document.querySelectorAll('.category');
       categories.forEach(cat => cat.classList.remove('active'));
       document.getElementById(categoryId).classList.add('active');
     }
+       document.addEventListener("DOMContentLoaded", function () {
+        fetch('http://localhost:8080/produk')
+            .then(response => response.json())
+            .then(data => {
+                displayProducts(data);
+            })
+            .catch(error => console.error('Error fetching products:', error));
+
+        // Fetch payment methods from localhost:8080/metode_pembayaran
+        // fetch('http://localhost:8080/metode_pembayaran')
+        //     .then(response => response.json())
+        //     .then(paymentMethods => {
+        //         // Call a function to display payment methods in dropdown
+        //         displayPaymentMethods(paymentMethods);
+        //     })
+        //     .catch(error => console.error('Error fetching payment methods:', error));
+    });
+
+    function displayProducts(products) {
+        const productGrid = document.getElementById('productGrid');
+        products.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('productCard');
+            if (product.Foto) {
+                productCard.innerHTML = `
+                    <img src="${product.Foto}" alt="${product.Nama}">
+                `;
+            }
+
+            productCard.innerHTML += `
+                <div class="productCardContent">
+                    <h3>${product.Nama}</h3>
+                    <p>${product.Detail}</p>
+                    <p>Harga: Rp.${product.Harga}</p>
+                    <p>Stok:${product.KetersedianStok}</p>
+                    <label for="quantity">kuantiti:</label>
+                    <div>
+                    <select class="quantityDropdown" id="quantity${product.Id}">
+                        ${generateQuantityOptions()}
+                    </select>
+                    </div>
+                    <label for="paymentMethod">Metode Pembayaran:</label>
+                    <div class="paymentDropdown" onclick="togglePaymentOptions(${product.Id})">
+                        <span id="selectedPayment${product.Id}">Select Payment</span>
+                        <div class="paymentDropdownOptions" id="paymentOptions${product.Id}">
+                            <!-- Payment methods will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    <button class="checkoutButton" onclick="checkout('${product.Nama}', '${product.Id}', ${product.Harga})">Checkout</button>
+                </div>
+            `;
+
+            productGrid.appendChild(productCard);
+
+            fetch(`http://localhost:8080/metode_pembayaran`)
+                .then(response => response.json())
+                .then(paymentMethods => {
+                    productCard.innerHTML += ``
+                    displayPaymentMethods(paymentMethods, product.Id);
+                })
+                .catch(error => console.error('Error fetching payment methods:', error));
+        });
+    }
+    // function displayPaymentMethods(paymentMethods) {
+    //     // Loop through payment methods and add options to the dropdowns
+    //     paymentMethods.forEach(method => {
+    //         const paymentOptions = document.querySelectorAll('.paymentDropdownOptions');
+    //         paymentOptions.forEach((optionsContainer) => {
+    //             const paymentOptions = document.getElementById(`paymentOptions${method.Nama}`);
+    //             optionsContainer.innerHTML += `<div class="paymentOption" onclick="selectPayment('${method.Nama}')">${method.Nama}</div>`;
+    //         });
+    //     });
+    // }
+    function displayPaymentMethods(paymentMethods, productId) {
+        paymentMethods.forEach(method => {
+            const paymentOptions = document.getElementById(`paymentOptions${productId}`);
+            // paymentOptions.innerHTML += `<div class="paymentOption" onclick="selectPayment(${productId}, '${method.Nama}')">${method.Nama}</div>`;
+            paymentOptions.innerHTML += `
+                <div class="paymentOption" id="${method.Id}" onclick="selectPayment(${productId}, '${method.Nama}', ${method.Id})">
+                    <span id="paymentMethodId${method.Id}">${method.Nama}</span>
+                </div>`;
+        });
+    }
+
+    function togglePaymentOptions(productId) {
+        const paymentOptions = document.getElementById(`paymentOptions${productId}`);
+        paymentOptions.classList.toggle('show');
+    }
+
+
+    function selectPayment(productId, paymentMethod, paymentMethodId) {
+        document.getElementById(`selectedPayment${productId}`).innerText = paymentMethod;
+        document.getElementById(`selectedPayment${productId}`).setAttribute('data-payment-id', paymentMethodId);
+        document.getElementById(`paymentOptions${productId}`).classList.remove('show');
+        
+        const paymentMethodSpan = document.getElementById(`paymentMethodId${paymentMethodId}`);
+    }
+
+    function generateQuantityOptions() {
+        let optionsHTML = '';
+        for (let i = 1; i <= 10; i++) {
+            optionsHTML += `<option value="${i}">${i}</option>`;
+        }
+        return optionsHTML;
+    }
+    function checkout(productName, productId, productPrice) {
+        const userId = 123;
+        const userName = 'John';
+
+        let qty = document.getElementById(`quantity${productId}`).value;
+        let selectedQuantity = parseInt(qty)
+        const selectedPayment = document.getElementById(`selectedPayment${productId}`).innerText;
+        const checkoutData = {
+            user_id: userId,
+            username: userName,
+            produk_id: parseInt(productId),
+            total_harga: productPrice * selectedQuantity,
+            kuantiti: selectedQuantity,
+            nama_produk: productName,
+            metode_pembayaran: selectedPayment
+        }
+        fetch('http://localhost:8080/checkout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(checkoutData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Checkout successful:', data);
+            alert(`Checkout for ${productName} successful!`);
+        })
+        .catch(error => {
+            console.error('Error during checkout:', error);
+            alert(`Error during checkout for ${productName}`);
+        });
+    }
   </script>
+<!-- <div class="whatsapp-float">
+  <a href="javascript:void(0)" onclick="openWhatsAppOrder()" class="whatsapp-button">
+    <i class="fab fa-whatsapp"></i> Pesan via WhatsApp
+  </a>
+</div> -->
+
+<script>
+
+  function openWhatsAppOrder() {
+    // Get produk yang disedang diliat
+    const activeCategory = document.querySelector('.category.active');
+    if (!activeCategory) return;
+    
+    const firstProduct = activeCategory.querySelector('li');
+    if (!firstProduct) return;
+    
+    const productName = firstProduct.querySelector('h2').innerText;
+    const productDesc = firstProduct.querySelector('p').innerText;
+    const productImg = firstProduct.querySelector('img').src;
+    
+    const phone = "6285720058047"; 
+    const message = `Halo, saya tertarik dengan produk:\n\n*${productName}*\n(${productDesc})\n\nBisa info lebih detail?`;
+    
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+  }
+    // Attach event listeners to static product cart icons
+  document.querySelectorAll('.shopping i').forEach(icon => {
+    icon.addEventListener('click', handleCartClick);
+  });
+  
+  // Function API (tambahan)
+  function enhanceApiProducts() {
+    document.querySelectorAll('.productCard').forEach(card => {
+      if (!card.querySelector('.whatsapp-btn')) {
+        const btn = document.createElement('button');
+        btn.className = 'whatsapp-btn';
+        btn.innerHTML = '<i class="fab fa-whatsapp"></i> WhatsApp';
+        btn.onclick = function() {
+          const productName = card.querySelector('h3').innerText;
+          const price = card.querySelector('p:nth-of-type(2)').innerText;
+          const qty = card.querySelector('select').value;
+          const phone = "6281234567890";
+          const message = `Halo, saya ingin memesan:\n\n*${productName}*\n${price}\nJumlah: ${qty}`;
+          window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        };
+        card.querySelector('.productCardContent').appendChild(btn);
+      }
+    });
+  }
+  
+  // Call after Load API
+  if (typeof displayProducts === 'function') {
+    const originalDisplayProducts = displayProducts;
+    displayProducts = function(products) {
+      originalDisplayProducts(products);
+      setTimeout(enhanceApiProducts, 500); 
+    };
+  }
+  // Fungsi untuk menangani klik keranjang produk
+  function handleCartClick(event) {
+    event.preventDefault();
+    const productItem = event.currentTarget.closest('li');
+    if (!productItem) return;
+    
+    const productName = productItem.querySelector('h2').innerText;
+    const productDesc = productItem.querySelector('p').innerText;
+    const phone = "6285720058047"; 
+    
+    const message = `Halo Amanda Brownies,\nSaya ingin memesan:\n\n*${productName}*\n(${productDesc})\n\nBisa diproses?`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+  }
+
+  // Fungsi untuk handle produk dari API
+  function handleApiCartClick(productName, productPrice, productId) {
+    const quantity = document.getElementById(`quantity${productId}`).value;
+    const phone = "6285720058047";
+    
+    const message = `Halo Amanda Brownies,\nSaya ingin memesan:\n\n*${productName}*\nHarga: Rp${productPrice}\nJumlah: ${quantity}\nTotal: Rp${productPrice * quantity}\n\nBisa diproses?`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+  }
+//icon pemesanan produk
+  document.querySelectorAll('.shopping i').forEach(icon => {
+    icon.addEventListener('click', handleCartClick);
+  });
+
+  // fungsi yang di gunakan untuk memodifikasi display products untuk produk API
+  if (typeof displayProducts === 'function') {
+    const originalDisplayProducts = displayProducts;
+    displayProducts = function(products) {
+      originalDisplayProducts(products);
+      
+      // mengganti tombol checkout dengan WhatsApp
+      document.querySelectorAll('.checkoutButton').forEach(button => {
+        const onclickAttr = button.getAttribute('onclick');
+        const matches = onclickAttr.match(/checkout\('([^']+)', '([^']+)', (\d+)\)/);
+        if (matches) {
+          const productName = matches[1];
+          const productId = matches[2];
+          const productPrice = matches[3];
+          button.onclick = (e) => {
+            e.preventDefault();
+            handleApiCartClick(productName, productPrice, productId);
+          };
+        }
+      });
+    };
+  }
+</script>
+
 </body>
 </html>

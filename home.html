@@ -366,5 +366,27 @@
 });
     
 </script>
+   <script type="module" src="app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let currentSlide = 0;
+            const totalSlides = 3;
+            function moveSlide(direction) {
+                currentSlide += direction;
+                if (currentSlide < 0) currentSlide = totalSlides - 1;
+                if (currentSlide >= totalSlides) currentSlide = 0;
+                const track = document.getElementById('slider-container');
+                track.style.transform = `translateX(-${currentSlide * 33}%)`;
+            }
+            document.querySelector('.controls button:nth-child(1)').onclick = () => moveSlide(-1);
+            document.querySelector('.controls button:nth-child(2)').onclick = () => moveSlide(1);
+        });
+
+        // ADDED: fetch to Go backend API without altering existing logic
+        fetch('/api/hello')  // pastikan endpoint Go tersedia
+            .then(response => response.json())
+            .then(data => document.getElementById('message').innerText = data.message)
+            .catch(err => document.getElementById('message').innerText = 'Gagal memuat data.');
+    </script>
 </body>
 </html>
