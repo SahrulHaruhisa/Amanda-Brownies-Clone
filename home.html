@@ -19,8 +19,46 @@
             <li><a href="home.html">Home</a></li>
             <li><a href="product.html">Products</a></li>
             <li><a href="location.html">Store Location</a></li>
+            <li class="cart" onclick="toggleCart()"><i class="fa-solid fa-cart-shopping"></i>
+            <span class="count">0</span>
+            </li>
         </ul>
     </header>
+    <main class="cart-panel">
+        <h3> My Cart</h3>
+        <div class="cart-des">
+            <div class="grid-des">
+                <div class="product-design">
+                    <img src="slider1.png" alt="" srcset="">
+                <h2>name product</h2>
+                    <p class="harga">RP.40.000</p>
+                    <i class="fa-solid fa-trash"></i>
+                </div>
+               <div class="product-design">
+                    <img src="slider1.png" alt="" srcset="">
+                <h2>name product</h2>
+                    <p class="harga">RP.40.000</p>
+                    <i class="fa-solid fa-trash"></i>
+                </div>
+                <div class="product-design">
+                    <img src="slider1.png" alt="" srcset="">
+                <h2>name product</h2>
+                    <p class="harga">RP.40.000</p>
+                    <i class="fa-solid fa-trash"></i>
+                </div>
+            </div>
+            <figure class="sub">
+                <div class="sub-me">
+                    <p class="jenis">Subtotal</p>
+                    <p class="harga-total">Rp500.0000</p>
+                </div>
+                 <div class="checkout"><h4> proceed to checkout</h4></div>
+                 <div class="continue"><h1>Continue shopping</h1></div>
+                
+
+            </figure>
+        </div>
+    </main>
 
     <main class="banner">
         <figure class="bg1">
@@ -364,7 +402,11 @@
   document.querySelector('.controls button:nth-child(1)').onclick = () => moveSlide(-1);
   document.querySelector('.controls button:nth-child(2)').onclick = () => moveSlide(1);
 });
-    
+      function toggleCart() {
+  const panel = document.querySelector('.cart-panel');
+  panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+}
+
 </script>
    <script type="module" src="app.js"></script>
     <script>
